@@ -1,0 +1,27 @@
+version: '3.6'
+
+
+services:
+  redis:
+    image: redis:6.2.6-bullseye
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  celery:
+    build: celery_worker/
+    container_name: celery
+    restart: unless-stopped
+    env_file:
+      - celery_worker/.celery.env
+    depends_on:
+      - redis
+
+
+volumes:
+  redis_data:
+    name: redis_data
+
