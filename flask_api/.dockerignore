@@ -3,9 +3,16 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.idea
+
+.env
+.gitignore
+.dockerignore
+dev-compose.yaml
 
 # C extensions
 *.so
+
 
 # Distribution / packaging
 .Python
@@ -106,7 +113,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-flask_api/.env
+.env
 .venv
 env/
 venv/
@@ -137,4 +144,4 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-celery_worker/.celery.env
+

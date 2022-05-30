@@ -1,0 +1,12 @@
+Flask[async]==2.0.2
+gevent~=21.12.0
+Flask-SQLAlchemy~=2.5.1
+pandas==1.4.2
+redis~=4.0.2
+SQLAlchemy~=1.4.28
+orjson~=3.6.5
+pydantic~=1.8.2
+psycopg2-binary==2.9.2
+flasgger==0.9.5
+alembic==1.7.5
+requests==2.27.1

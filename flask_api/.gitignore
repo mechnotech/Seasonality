@@ -3,7 +3,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+.idea
 # C extensions
 *.so
 
@@ -106,7 +106,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-flask_api/.env
+.env
 .venv
 env/
 venv/
@@ -137,4 +137,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-celery_worker/.celery.env

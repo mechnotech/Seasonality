@@ -1,0 +1,133 @@
+openapi: 3.0.2
+info:
+  title: 'Seasonality calc API'
+  version: '0.1'
+  description: |
+    запросы к API начинаются с `/api/v1/`
+    # Описание
+    
+    # Как работает это API
+    
+    ![](/static/scheme.png)
+    
+    1. Celery создает регулярный таск на обновление котировок по некому тикеру
+    2. По мере выполнения worker`ом Celery таска, результат отправляется в Redis. Celery worker дергает за ручку этого API (Flask)  pull/ чтоб Flask забрал результат.
+    3. Результат расчета "сезонности" для указанного в TЗ датасета можно получить в выдаче API c seasonality/ 
+
+servers:
+  - url: /api/v1/
+
+tags:
+  - name: HISTORY
+    description: Работа с историческими данными котировок
+
+paths:
+  /history/pull/:
+    post:
+      tags:
+        - HISTORY
+      description: Celery уведомляет о завершении таска, данные готовы для закачки в БД
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example: {
+                'task_id': "3cba42e1-49c0-4687-926f-e45fb2eeba55",
+                'ticker': "IBM"
+              }
+      responses:
+        404:
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {"msg": "Task ID UUID data not found"}
+          description: Not found
+        400:
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {
+                  "msg": "Wrong request format (possible wrong UUID)" }
+          description: Wrong request
+        201:
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {
+  "msg": {
+    "Meta Data": {
+      "1. Information": "Daily Prices (open, high, low, close) and Volumes",
+      "2. Symbol": "IBM",
+      "3. Last Refreshed": "2022-05-27",
+      "4. Output Size": "Compact",
+      "5. Time Zone": "US/Eastern"
+    },
+    "Time Series (Daily)": {
+      "2022-01-05": {
+        "1. open": "138.3100",
+        "2. high": "142.2000",
+        "3. low": "137.8800",
+        "4. close": "138.2200",
+        "5. volume": "8956910"
+      },
+      "2022-01-06": {
+        "1. open": "138.2000",
+        "2. high": "138.4099",
+        "3. low": "132.5100",
+        "4. close": "135.3400",
+        "5. volume": "9908081"
+      },}}}
+
+          description: История обновлена
+
+  /history/seasonality/:
+    get:
+      tags:
+        - HISTORY
+      description: Запрос данных по сезонности за 5, 10, 15 лет и для текущего года
+
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                example: {
+    "msg": {
+        "10 years": {
+            "День года": "Значение",
+            "2": 0.0,
+            "3": 0.31,
+            "4": 0.3,
+            "363": -3.36,
+            "364": 3.97,
+            "365": 2.35,
+            "366": -19.28
+        },
+        "This year": {
+            "Дата текущего года": "Значение",
+            "2022-01-03": 0.0,
+            "2022-01-04": -0.62,
+            "2022-01-05": 2.61,
+            "2022-01-06": 1.97,
+            "2022-01-07": 2.59,
+            "2022-01-10": 5.42,
+            "2022-01-11": 4.24,
+            "2022-01-12": 5.35,
+            "2022-01-13": 6.7,
+            "2022-01-14": 4.64,
+            "2022-01-18": 5.68,
+            "2022-01-19": 5.42,
+            "2022-01-20": 8.34,
+        }
+    }
+}
+
+          description: Данные по сезонности по периодам
+
+
+

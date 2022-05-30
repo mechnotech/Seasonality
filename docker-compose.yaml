@@ -16,12 +16,40 @@ services:
     container_name: celery
     restart: unless-stopped
     env_file:
-      - celery_worker/.celery.env
+      - celery_worker/.celery.env.example
     depends_on:
       - redis
 
 
+  postgres_price:
+    image: postgres:13.0
+    container_name: postgres_price
+    restart: always
+    volumes:
+      - postgres_data_price:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+    env_file:
+      - flask_api/.env.example
+
+
+  flask_api:
+      build: flask_api/
+      container_name: flask_api
+      volumes:
+        - flask_static_volume:/code/src/static
+      depends_on:
+        - postgres_price
+      env_file:
+        - flask_api/.env.example
+      ports:
+        - "5000:5000"
+
 volumes:
   redis_data:
     name: redis_data
+  postgres_data_price:
+    name: postgres_data_price
+  flask_static_volume:
+    name: flask_static_volume
 
